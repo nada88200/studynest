@@ -26,7 +26,7 @@ export const authOptions = {
             return null;
           }
 
-          return user;
+          return { id: user._id, email: user.email, name: user.name, role: user.role };
         } catch (error) {
           console.log("Error: ", error);
         }
@@ -40,6 +40,24 @@ export const authOptions = {
   pages: {
       signIn: "/",
   },
+    callbacks: {
+        async jwt({ token, user }) {
+        if (user) {
+            token.id = user.id;
+            token.name = user.name;
+            token.email = user.email;
+            token.role = user.role;
+        }
+        return token;
+        },
+        async session({ session, token }) {
+        session.user.id = token.id;
+        session.user.name = token.name;
+        session.user.email = token.email;
+        session.user.role = token.role;
+        return session;
+        },
+    },
 };
 
 const handler = NextAuth(authOptions);

@@ -3,6 +3,7 @@ import Link from "next/link";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { signIn } from "next-auth/react";
+import { useSession } from "next-auth/react";
 
 // Import the CSS file
 import "../styles/css/LoginForm.css";
@@ -12,6 +13,7 @@ export default function LoginForm() {
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const router = useRouter();
+    const { data: session } = useSession();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -30,7 +32,16 @@ export default function LoginForm() {
         setError("Invalid credentials");
         return;
       }
-      router.replace("dashboard");
+      if(session.user.role === "admin") {
+         router.push("/adminDashboard");
+      } else if(session.user.role === "tutor") {
+         router.push("/tutorDashboard");
+       }
+       else {
+         router.push("/dashboard");
+       }
+        
+      //router.replace("dashboard");
     } catch (error) {
       console.log("An error occurred", error);
     }
